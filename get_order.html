@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机抽取数据</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+        }
+        #items {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            min-height: 100px;
+            padding: 10px;
+        }
+        #result {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>随机抽取数据</h1>
+    
+    <input type="text" id="input" placeholder="输入数据项">
+    <button onclick="addItem()">添加</button>
+    <button onclick="drawItem()">随机抽取</button>
+    
+    <div id="items"></div>
+    <div id="result"></div>
+    
+    <script>
+        const items = [];
+        
+        function addItem() {
+            const input = document.getElementById('input');
+            if (input.value.trim() !== '') {
+                items.push(input.value);
+                input.value = '';
+                updateItemsDisplay();
+            }
+        }
+        
+        function drawItem() {
+            const resultDiv = document.getElementById('result');
+            if (items.length > 0) {
+                const randomIndex = Math.floor(Math.random() * items.length);
+                resultDiv.textContent = `随机抽取结果: ${items[randomIndex]}`;
+            } else {
+                resultDiv.textContent = '请先添加数据';
+            }
+        }
+        
+        function updateItemsDisplay() {
+            const itemsDiv = document.getElementById('items');
+            itemsDiv.innerHTML = items.map(item => 
+                `<div>${item}</div>`
+            ).join('');
+        }
+    </script>
+</body>
+</html>
