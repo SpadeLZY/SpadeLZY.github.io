@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>随机抽取数据</title>
+    <title>遇事不决,可问春风</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -36,11 +36,11 @@
     </style>
 </head>
 <body>
-    <h1>随机抽取数据</h1>
+    <h1>遇事不决,可问春风</h1>
     
-    <input type="text" id="input" placeholder="输入数据项">
+    <input type="text" id="input" placeholder="输入选项">
     <button onclick="addItem()">添加</button>
-    <button onclick="drawItem()">随机抽取</button>
+    <button onclick="drawItem()">卜算</button>
     
     <div id="items"></div>
     <div id="result"></div>
@@ -61,7 +61,7 @@
             const resultDiv = document.getElementById('result');
             if (items.length > 0) {
                 const randomIndex = Math.floor(Math.random() * items.length);
-                resultDiv.textContent = `随机抽取结果: ${items[randomIndex]}`;
+                resultDiv.textContent = `春风回复: ${items[randomIndex]}`;
             } else {
                 resultDiv.textContent = '请先添加数据';
             }
