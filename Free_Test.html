@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>恋爱价值评分 · 你在关系里的稀缺度</title>
+<style>
+  :root{
+    --bg:#FFF7F4;
+    --card:#FFFFFF;
+    --ink:#2A2230;
+    --ink-2:#5B4E60;
+    --muted:#9A8B98;
+    --rose:#E4586F;
+    --rose-deep:#C93F58;
+    --rose-soft:#FFE6EA;
+    --gold:#C69749;
+    --line:#F2E4E2;
+    --shadow:0 18px 50px -24px rgba(180,90,110,.35);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .serif{font-family:"Songti SC","Noto Serif SC",Georgia,"Times New Roman",serif;}
+  /* 背景装饰 */
+  .blob{position:fixed;border-radius:50%;filter:blur(60px);opacity:.55;pointer-events:none;z-index:0;}
+  .b1{width:320px;height:320px;background:#FFD5DC;top:-120px;right:-100px;}
+  .b2{width:280px;height:280px;background:#FFE8D2;bottom:-120px;left:-110px;}
+  .b3{width:200px;height:200px;background:#F4E3FF;top:40%;left:60%;opacity:.35;}
+
+  .wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:0 22px 60px;}
+
+  /* ============ 封面 ============ */
+  #cover{padding-top:64px;text-align:center;animation:fadeUp .7s ease both;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12px;letter-spacing:.14em;color:var(--rose-deep);
+    background:#fff;border:1px solid var(--line);
+    padding:7px 14px;border-radius:100px;box-shadow:0 6px 18px -12px rgba(200,100,120,.5);
+  }
+  .dot{width:5px;height:5px;border-radius:50%;background:var(--rose);}
+  h1.title{
+    font-size:44px;line-height:1.22;margin:26px 0 0;letter-spacing:.02em;font-weight:600;
+  }
+  h1.title em{font-style:normal;color:var(--rose);}
+  .sub{margin:16px auto 0;max-width:330px;font-size:14.5px;line-height:1.85;color:var(--ink-2);}
+  .heart-line{margin:30px 0 26px;display:flex;align-items:center;justify-content:center;gap:14px;}
+  .heart-line i{display:block;height:1px;width:52px;background:linear-gradient(90deg,transparent,var(--line));}
+  .heart-line i:last-child{background:linear-gradient(90deg,var(--line),transparent);}
+  .heart-line span{color:var(--rose);font-size:13px;}
+
+  .rules{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:22px 22px 8px;text-align:left;box-shadow:var(--shadow);margin-top:8px;
+  }
+  .rules h3{margin:0 0 14px;font-size:13px;letter-spacing:.1em;color:var(--muted);font-weight:500;}
+  .rule{display:flex;gap:12px;margin-bottom:15px;font-size:13.5px;line-height:1.7;color:var(--ink-2);}
+  .rule b{
+    flex:none;width:20px;height:20px;border-radius:50%;background:var(--rose-soft);color:var(--rose-deep);
+    font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:600;margin-top:1px;
+  }
+  .rule strong{color:var(--ink);font-weight:600;background:none;width:auto;height:auto;}
+  .meta{display:flex;gap:8px;justify-content:center;margin-top:20px;flex-wrap:wrap;}
+  .chip{font-size:11.5px;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:100px;padding:6px 13px;}
+
+  .btn{
+    display:block;width:100%;border:none;cursor:pointer;
+    font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:.06em;
+    color:#fff;background:linear-gradient(135deg,#EE6E82,#D8415C);
+    padding:18px;border-radius:16px;margin-top:26px;
+    box-shadow:0 16px 30px -14px rgba(216,65,92,.75);
+    transition:transform .18s ease,box-shadow .18s ease;
+  }
+  .btn:active{transform:scale(.985);box-shadow:0 8px 18px -12px rgba(216,65,92,.8);}
+  .btn.ghost{
+    background:#fff;color:var(--ink-2);border:1px solid var(--line);box-shadow:none;font-weight:500;
+  }
+  .footnote{margin-top:20px;font-size:11.5px;color:#B6A8B4;line-height:1.7;text-align:center;}
+  .lastbadge{
+    display:none;margin:18px auto 0;font-size:12px;color:var(--rose-deep);
+    background:var(--rose-soft);border-radius:100px;padding:7px 14px;width:fit-content;
+  }
+
+  /* ============ 答题 ============ */
+  #quiz{display:none;padding-top:40px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted);letter-spacing:.06em;}
+  .progress-track{margin-top:12px;height:4px;background:#F4E6E4;border-radius:10px;overflow:hidden;}
+  .progress-fill{height:100%;width:0;border-radius:10px;background:linear-gradient(90deg,#F2869A,#D8415C);transition:width .4s cubic-bezier(.22,1,.36,1);}
+  .qnum{margin-top:34px;font-size:12px;letter-spacing:.18em;color:var(--rose);font-weight:600;}
+  .qtext{
+    margin-top:12px;font-size:23px;line-height:1.62;letter-spacing:.01em;font-weight:600;min-height:112px;
+  }
+  .options{margin-top:26px;display:flex;flex-direction:column;gap:11px;}
+  .opt{
+    display:flex;align-items:center;gap:14px;text-align:left;width:100%;
+    background:#fff;border:1.5px solid var(--line);border-radius:14px;
+    padding:16px 18px;font-family:inherit;font-size:14.5px;color:var(--ink-2);cursor:pointer;
+    transition:all .18s ease;
+  }
+  .opt .k{
+    flex:none;width:24px;height:24px;border-radius:8px;background:#FAF2F0;color:#B7A6B4;
+    font-size:11.5px;display:flex;align-items:center;justify-content:center;font-weight:600;
+    transition:all .18s ease;
+  }
+  .opt:hover{border-color:#F3C6CE;background:#FFFBFA;}
+  .opt.on{border-color:var(--rose);background:linear-gradient(135deg,#FFF6F7,#FFEDF0);color:var(--rose-deep);font-weight:600;}
+  .opt.on .k{background:var(--rose);color:#fff;}
+  .navrow{display:flex;align-items:center;justify-content:space-between;margin-top:26px;}
+  .back{
+    background:none;border:none;font-family:inherit;font-size:13px;color:var(--muted);cursor:pointer;padding:8px 0;
+  }
+  .back:hover{color:var(--rose-deep);}
+  .hint{font-size:11.5px;color:#C4B6C2;}
+  .qwrap{animation:slideIn .38s cubic-bezier(.22,1,.36,1) both;}
+
+  /* ============ 结果 ============ */
+  #result{display:none;padding-top:38px;}
+  .rhead{text-align:center;}
+  .rhead .lab{font-size:11.5px;letter-spacing:.2em;color:var(--muted);}
+  .scorecard{
+    position:relative;margin-top:18px;background:var(--card);border:1px solid var(--line);
+    border-radius:26px;padding:30px 22px 26px;box-shadow:var(--shadow);overflow:hidden;
+  }
+  .scorecard::before{
+    content:"";position:absolute;top:-70px;right:-60px;width:200px;height:200px;border-radius:50%;
+    background:radial-gradient(circle,#FFE1E6,transparent 70%);opacity:.8;
+  }
+  .ring{position:relative;width:190px;height:190px;margin:0 auto;}
+  .ring svg{transform:rotate(-90deg);}
+  .ring .inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .big{font-size:56px;font-weight:600;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;}
+  .big small{font-size:15px;color:var(--muted);font-weight:400;margin-left:3px;}
+  .ring .cap{font-size:11px;letter-spacing:.16em;color:var(--muted);margin-top:9px;}
+  .grade{
+    display:inline-flex;align-items:center;gap:8px;margin:16px auto 0;
+    font-size:13px;font-weight:600;letter-spacing:.1em;padding:8px 18px;border-radius:100px;
+  }
+  .g-S{background:linear-gradient(135deg,#FBF0D8,#F6E3B8);color:#8A6420;}
+  .g-A{background:var(--rose-soft);color:var(--rose-deep);}
+  .g-B{background:#EAF1F8;color:#3F6B95;}
+  .g-C{background:#F2EFF2;color:#77707C;}
+  .oneline{margin-top:16px;font-size:13.5px;line-height:1.8;color:var(--ink-2);text-align:center;padding:0 6px;}
+
+  .sec{margin-top:26px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px 22px;box-shadow:0 12px 36px -28px rgba(120,60,80,.5);}
+  .sec h2{margin:0;font-size:11.5px;letter-spacing:.18em;color:var(--muted);font-weight:500;}
+  .typen{margin-top:14px;font-size:27px;font-weight:600;letter-spacing:.02em;}
+  .typen span{color:var(--rose);}
+  .typetag{margin-top:10px;font-size:14px;line-height:1.8;color:var(--ink-2);}
+  .typebody{margin-top:20px;font-size:13.5px;line-height:1.9;color:var(--ink-2);}
+
+  .list{margin-top:18px;display:flex;flex-direction:column;gap:12px;}
+  .li{display:flex;gap:11px;font-size:13.5px;line-height:1.75;color:var(--ink-2);}
+  .li i{flex:none;width:6px;height:6px;border-radius:50%;background:var(--rose);margin-top:9px;opacity:.6;}
+  .li.warn i{background:#E2A23B;}
+
+  .radar{margin:6px auto 0;display:block;width:100%;max-width:340px;}
+  .radar text{font-size:10.5px;fill:var(--muted);font-family:inherit;}
+
+  .bars{margin-top:20px;display:flex;flex-direction:column;gap:16px;}
+  .bar-row{display:flex;flex-direction:column;gap:7px;}
+  .bar-top{display:flex;align-items:baseline;justify-content:space-between;font-size:13px;}
+  .bar-top b{font-weight:500;color:var(--ink);}
+  .bar-top span{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .track{height:7px;border-radius:10px;background:#F7ECEA;overflow:hidden;}
+  .fill{height:100%;width:0;border-radius:10px;transition:width .9s cubic-bezier(.22,1,.36,1);}
+  .bar-note{font-size:11.5px;color:#B0A2AF;line-height:1.6;}
+
+  .recipe{margin-top:16px;font-size:13.5px;line-height:1.9;color:var(--ink-2);background:#FFF9F6;border-radius:14px;padding:16px 18px;border:1px dashed #F0DCD8;}
+
+  .actions{margin-top:26px;display:flex;flex-direction:column;gap:11px;}
+  .row2{display:flex;gap:11px;}
+  .row2 .btn{margin-top:0;flex:1;font-size:13.5px;padding:15px;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  @keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+  @keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+  .pop{animation:pop .6s cubic-bezier(.22,1,.36,1) both;}
+
+  .toast{
+    position:fixed;left:50%;bottom:40px;transform:translate(-50%,20px);
+    background:rgba(42,34,48,.92);color:#fff;font-size:13px;padding:12px 20px;border-radius:100px;
+    opacity:0;transition:all .3s ease;pointer-events:none;z-index:99;backdrop-filter:blur(8px);
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+  @media (max-width:400px){
+    h1.title{font-size:37px;}
+    .qtext{font-size:21px;min-height:104px;}
+    .big{font-size:50px;}
+  }
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+
+<div class="wrap">
+
+  <!-- ===== 封面 ===== -->
+  <section id="cover">
+    <div class="eyebrow"><span class="dot"></span>关系自我觉察 · 第 1 版</div>
+    <h1 class="title serif">你在关系里的<br><em>稀缺度</em>有多高？</h1>
+    <p class="sub">恋爱不是抽奖，是一种可被拆解的能力。<br>7 个维度、28 道题，看看你究竟贵在哪里。</p>
+    <div class="heart-line"><i></i><span>♡</span><i></i></div>
+
+    <div class="rules">
+      <h3>答题须知</h3>
+      <div class="rule"><b>1</b><div>按<strong>第一反应</strong>作答，越诚实越准。</div></div>
+      <div class="rule"><b>2</b><div>没有好坏对错，只有适配与否。</div></div>
+      <div class="rule"><b>3</b><div>结果只保存在你的浏览器里，不会上传。</div></div>
+    </div>
+
+    <div class="meta">
+      <span class="chip">28 题</span>
+      <span class="chip">约 3 分钟</span>
+      <span class="chip">7 维雷达图</span>
+    </div>
+
+    <button class="btn" id="startBtn">开始测评</button>
+    <div class="lastbadge" id="lastBadge"></div>
+    <p class="footnote">本测试为自我觉察工具，不构成心理诊断或临床评估。</p>
+  </section>
+
+  <!-- ===== 答题 ===== -->
+  <section id="quiz">
+    <div class="topbar">
+      <span id="qLabel">第 1 / 28 题</span>
+      <span id="qPct">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+    <div id="qContainer">
+      <div class="qwrap">
+        <div class="qnum" id="qNum">Q01</div>
+        <div class="qtext" id="qText"></div>
+        <div class="options" id="qOptions"></div>
+      </div>
+    </div>
+
+    <div class="navrow">
+      <button class="back" id="backBtn">← 上一题</button>
+      <span class="hint">键盘 1–5 可快速作答</span>
+    </div>
+  </section>
+
+  <!-- ===== 结果 ===== -->
+  <section id="result">
+    <div class="rhead"><div class="lab">你的恋爱价值指数</div></div>
+
+    <div class="scorecard">
+      <div class="ring">
+        <svg width="190" height="190" viewBox="0 0 190 190">
+          <circle cx="95" cy="95" r="82" fill="none" stroke="#F7EAE8" stroke-width="11"/>
+          <circle id="ringArc" cx="95" cy="95" r="82" fill="none" stroke="url(#rg)" stroke-width="11"
+                  stroke-linecap="round" stroke-dasharray="515.2" stroke-dashoffset="515.2"/>
+          <defs>
+            <linearGradient id="rg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#F08A9C"/>
+              <stop offset="100%" stop-color="#D8415C"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="inner">
+          <div class="big"><span id="scoreNum">0</span><small>分</small></div>
+          <div class="cap">LOVE VALUE</div>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div class="grade" id="gradeBadge"></div>
+      </div>
+      <p class="oneline" id="oneLine"></p>
+    </div>
+
+    <div class="sec">
+      <h2>你的关系人设</h2>
+      <div class="typen serif" id="typeName"></div>
+      <div class="typetag" id="typeTag"></div>
+      <div class="typebody" id="typeDesc"></div>
+      <div class="list" id="typeHigh"></div>
+      <div class="typebody" style="margin-top:22px;padding-top:18px;border-top:1px dashed var(--line)">
+        <div style="font-size:11.5px;letter-spacing:.16em;color:var(--muted);margin-bottom:10px">需要留意的盲点</div>
+        <div id="typeBlind" style="font-size:13.5px;line-height:1.9"></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2>七维能力图谱</h2>
+      <svg class="radar" id="radar" viewBox="0 0 340 300"></svg>
+      <div class="bars" id="bars"></div>
+    </div>
+
+    <div class="sec">
+      <h2>优先升级项</h2>
+      <div class="typebody" id="upgradeIntro" style="margin-top:12px"></div>
+      <div class="list" id="upgradeList"></div>
+      <div class="recipe" id="recipe"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="posterBtn">保存结果图 · 分享给 TA</button>
+      <div class="row2">
+        <button class="btn ghost" id="copyBtn">复制文案</button>
+        <button class="btn ghost" id="againBtn">重新测一次</button>
+      </div>
+    </div>
+    <p class="footnote">分数会随状态浮动，隔一段时间再测一次，你会看到自己的变化。</p>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= 维度定义 ================= */
+  const DIMS = [
+    { key:'emo', name:'情绪稳定', weight:0.18,
+      note:'你的情绪是否可预测，冲突时能不能稳住场。',
+      action:'记录你的情绪触发点，上头时练一句：「我现在有点上头，给我十分钟。」' },
+    { key:'emp', name:'共情理解', weight:0.16,
+      note:'你能不能听见话底下那句没说出口的。',
+      action:'每天一次复述练习：先复述对方说的，再确认「是这样吗」。' },
+    { key:'com', name:'沟通修复', weight:0.18,
+      note:'问题出现时，你是拆解它，还是回避它。',
+      action:'用「我句式」表达：我感到……因为……我希望……，不评价人格。' },
+    { key:'exp', name:'亲密表达', weight:0.13,
+      note:'你让不让人感到被看见、被喜欢。',
+      action:'每天给对方一条具体的夸奖，越具体越好，别说「你真好」。' },
+    { key:'res', name:'责任担当', weight:0.15,
+      note:'你的承诺有没有交付记录。',
+      action:'答应前先评估，答应后写下来。少承诺一件，多完成一件。' },
+    { key:'bnd', name:'边界独立', weight:0.10,
+      note:'你在关系里，是否还是一个完整的人。',
+      action:'每周留半天完全属于自己，并坦然告诉对方，而不是偷偷消失。' },
+    { key:'gro', name:'成长潜力', weight:0.10,
+      note:'你把关系当命，还是当可以养的东西。',
+      action:'每月一次关系复盘：一件做得好的、一件想改的，各说一条。' }
+  ];
+
+  /* ================= 题库（28题） ================= */
+  const Q = [
+    { d:'emo', t:'争执到一半，我能先把语气放软，而不是继续加码。' },
+    { d:'emo', t:'对方几小时没回消息，我会开始脑补最坏的情况。', rev:true },
+    { d:'emo', t:'我很累的时候，仍然分得清「我很疲惫」和「你不好」。' },
+    { d:'emo', t:'我的心情好坏，很大程度取决于对方当天的态度。', rev:true },
+
+    { d:'emp', t:'对方说「我没事」的时候，我通常能感觉到后面还有话。' },
+    { d:'emp', t:'我愿意主动了解对方在意的事，哪怕我自己并不感兴趣。' },
+    { d:'emp', t:'我常觉得：我为你做了这么多，你怎么就是不懂。', rev:true },
+    { d:'emp', t:'对方难过时，我更倾向先陪着，而不是先给解决方案。' },
+
+    { d:'com', t:'有不满时，我会直接说清楚，而不是等对方自己猜。' },
+    { d:'com', t:'吵完架，我通常是等对方先低头的那一个。', rev:true },
+    { d:'com', t:'我能就事论事地谈问题，不翻旧账、不给人贴标签。' },
+    { d:'com', t:'我害怕说出自己的需求，怕说了显得矫情。', rev:true },
+
+    { d:'exp', t:'我会主动制造小惊喜，不需要等到纪念日。' },
+    { d:'exp', t:'我习惯把喜欢说出口，而不是让对方自己体会。' },
+    { d:'exp', t:'我很少主动牵手、拥抱这类身体接触。', rev:true },
+    { d:'exp', t:'我擅长用具体的夸奖，让对方觉得自己被看见了。' },
+
+    { d:'res', t:'答应过的事，我会记在心上并兑现，不需要人提醒。' },
+    { d:'res', t:'关系出问题时，我先想「怎么解决」，而不是「要不要算了」。' },
+    { d:'res', t:'我愿意让重要的人认识我的家人和朋友。' },
+    { d:'res', t:'遇到麻烦，我容易先消失一阵，自己消化完再说。', rev:true },
+
+    { d:'bnd', t:'我保有自己的爱好和社交圈，不因为恋爱就全部让位。' },
+    { d:'bnd', t:'对方需要独处时，我能安心去做自己的事。' },
+    { d:'bnd', t:'我很难接受对方有我不知道的社交生活。', rev:true },
+    { d:'bnd', t:'我清楚自己的底线在哪，并能温和地守住它。' },
+
+    { d:'gro', t:'我愿意为关系调整习惯，但不打算把自己改掉。' },
+    { d:'gro', t:'我会认真回看自己在关系里做错的部分。' },
+    { d:'gro', t:'我认为「我们就是这样的人，改不了」是常态。', rev:true },
+    { d:'gro', t:'我愿意和对方一起定一些共同的小目标。' }
+  ];
+
+  const OPTS = ['完全不像我','不太像我','一半一半','比较像我','非常像我'];
+
+  /* ================= 类型文案 ================= */
+  const TYPES = {
+    emo:{
+      name:'定海神针型', tag:'你的爱是稳定输出，不靠情绪浓度取胜。',
+      desc:'你身上最贵的东西是「可预测」——对方不用猜今天的你会是什么温度。在充满不确定的关系里，这种稳定本身就是一种奢侈品。',
+      high:['冲突发生时，你能先稳住场，而不是先赢一口气。','你不把自己的情绪外包给对方，也不拿冷战当武器。'],
+      blind:'稳定久了，容易被误读成「没那么在意」。你可能习惯把真实感受压下去，直到某天一次性倒出来，让对方措手不及。',
+      match:'你适合那种情绪起伏大、但愿意表达的人——你给得起安全感，对方给得起热度。'
+    },
+    emp:{
+      name:'深海共情型', tag:'你能听见话底下那句没说出口的。',
+      desc:'和你相处的人常有一种「被理解」的体验，这比被喜欢更难得。你的注意力会自然地落到对方的情绪细节上。',
+      high:['对方的情绪你能接住，不会急着评判对错。','你让人愿意说真话，因为你听得进去。'],
+      blind:'容易过度承担对方的情绪，把「TA 不开心」当成自己的失职。你的需求常常排在最后，久了会积成委屈。',
+      match:'你适合表达能力一般、但内心细腻的人——你能翻译那些笨拙的真心。'
+    },
+    com:{
+      name:'关系修理工', tag:'问题在你这里不是终点，是可拆解的工序。',
+      desc:'你不太相信「性格不合」这种说法，你更相信「没谈清楚」。冲突对你来说是信息，不是灾难。',
+      high:['你能把情绪化的争吵，转成有结论的对话。','你不靠冷战施压，也不靠翻旧账取胜。'],
+      blind:'太会解决问题，有时会让对方觉得「你在处理我，而不是在爱我」。有些分歧其实不需要方案，只需要一句「我懂」。',
+      match:'你适合情绪化但愿意沟通的人——你提供框架，对方提供温度。'
+    },
+    exp:{
+      name:'氛围制造机', tag:'你让平凡的日子，有了被记住的可能。',
+      desc:'你懂得关系需要被「喂养」：一句具体的夸奖、一次没来由的惊喜、一个恰到好处的拥抱。你是关系里的温度源。',
+      high:['表达直接，对方不用靠猜来确认你的心意。','你擅长制造记忆点，让关系有闪光的部分。'],
+      blind:'热度容易起伏：状态好时浓烈，累了就彻底断电。长期关系里，稳定的陪伴往往比惊喜更稀缺。',
+      match:'你适合需要被看见、被肯定的人——你的表达正好是对方的语言。'
+    },
+    res:{
+      name:'长期主义伴侣', tag:'你的爱有交付日期，也有兑现记录。',
+      desc:'你不太会说漂亮话，但你说过的事大多会发生。在一个人人都在观望的时代，这种确定性极其罕见。',
+      high:['说到做到，不靠提醒，也不找借口。','遇事不逃，你会留下来把问题处理完。'],
+      blind:'容易把关系做成项目管理：进度、责任、目标都清晰，却少了松弛和玩心。爱不是只有交付，还需要浪费。',
+      match:'你适合想要稳定长期关系、能欣赏行动派的人——你的爱意都写在行动里。'
+    },
+    bnd:{
+      name:'清醒独立型', tag:'你有自己的世界，也因此更有吸引力。',
+      desc:'你不会为了关系把自己交出去。你有自己的节奏、朋友和热爱，这让你的靠近是选择，而不是依附。',
+      high:['不靠黏人维系关系，也不把对方当成全部内容。','底线清晰，能温和而坚定地守住自己。'],
+      blind:'独立过头会显得疏离。有时「我不需要你」不是洒脱，而是保护自己不受伤的方式。',
+      match:'你适合同样有自己节奏的人——彼此不打扰，又彼此在场。'
+    },
+    gro:{
+      name:'进化型伴侣', tag:'你相信关系是可以被养出来的。',
+      desc:'你不把性格当借口，也不把「合不来」当结论。你愿意调整、复盘、再试一次，这种弹性比当下的高分更值钱。',
+      high:['你会复盘，也真的会改，不只是嘴上认错。','你把关系当成两个人的共同作品。'],
+      blind:'容易把亲密关系变成成长任务，永远在「变得更好」，却忘了享受「现在这样也不错」。',
+      match:'你适合愿意一起变好、不玻璃心的人——你们的曲线是向上的。'
+    },
+    fallback:{
+      name:'潜力待解锁型', tag:'七项能力都停在中段，说明你还没被真正「用」过。',
+      desc:'这份结果里没有一个维度特别突出，也没有一个崩坏。这不是平庸，而是还没被激活——很多能力，只有在真正投入一段关系之后才会长出来。',
+      high:['你目前没有明显硬伤，可塑性反而最高。','你愿意做这个测试，本身就在意关系的质量。'],
+      blind:'要警惕「差不多就行」的惯性：不主动、不表达、也不复盘，关系会一直停在浅层。',
+      match:'你适合一个愿意先开口的人，TA 的明确会帮你把这些能力逐个点亮。'
+    }
+  };
+
+  /* ================= 状态 ================= */
+  const state = { i:0, answers:new Array(Q.length).fill(null), lastResult:null };
+  const $ = id => document.getElementById(id);
+  const cover = $('cover'), quiz = $('quiz'), result = $('result');
+
+  function toast(msg){
+    const t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._tm); t._tm = setTimeout(()=>t.classList.remove('show'),1900);
+  }
+
+  /* ================= 封面 ================= */
+  try{
+    const saved = JSON.parse(localStorage.getItem('lovevalue_last') || 'null');
+    if(saved && saved.score){
+      state.lastResult = saved;
+      const b = $('lastBadge');
+      b.style.display='block';
+      b.textContent = `上次测评：${saved.score} 分 · ${saved.date}`;
+    }
+  }catch(e){}
+
+  $('startBtn').onclick = () => {
+    state.i = 0; state.answers = new Array(Q.length).fill(null);
+    cover.style.display='none'; result.style.display='none'; quiz.style.display='block';
+    window.scrollTo({top:0,behavior:'instant'});
+    renderQ();
+  };
+
+  /* ================= 答题渲染 ================= */
+  function renderQ(){
+    const q = Q[state.i];
+    $('qNum').textContent = 'Q' + String(state.i+1).padStart(2,'0');
+    $('qText').textContent = q.t;
+    $('qLabel').textContent = `第 ${state.i+1} / ${Q.length} 题`;
+    const pct = Math.round(state.i / Q.length * 100);
+    $('progressFill').style.width = pct + '%';
+    $('qPct').textContent = pct + '%';
+
+    const box = $('qOptions');
+    box.innerHTML = '';
+    OPTS.forEach((label,idx)=>{
+      const btn = document.createElement('button');
+      btn.className = 'opt';
+      btn.type = 'button';
+      btn.innerHTML = `<span class="k">${idx+1}</span><span>${label}</span>`;
+      if(state.answers[state.i] === idx+1) btn.classList.add('on');
+      btn.onclick = ()=> choose(idx+1);
+      box.appendChild(btn);
+    });
+
+    const w = $('qContainer');
+    w.classList.remove('qwrap'); void w.offsetWidth; w.classList.add('qwrap');
+  }
+
+  function choose(v){
+    state.answers[state.i] = v;
+    const btns = $('qOptions').children;
+    for(let k=0;k<btns.length;k++) btns[k].classList.toggle('on', k === v-1);
+
+    setTimeout(()=>{
+      if(state.i < Q.length-1){ state.i++; renderQ(); }
+      else { finish(); }
+    }, 200);
+  }
+
+  $('backBtn').onclick = ()=>{
+    if(state.i === 0){
+      quiz.style.display='none'; cover.style.display='block'; window.scrollTo(0,0);
+    } else { state.i--; renderQ(); }
+  };
+
+  document.addEventListener('keydown', e=>{
+    if(quiz.style.display !== 'block') return;
+    if(e.key >= '1' && e.key <= '5') choose(Number(e.key));
+    if(e.key === 'Backspace'){ e.preventDefault(); $('backBtn').click(); }
+  });
+
+  /* ================= 计分 ================= */
+  const GRADE = [
+    { min:86, key:'S', text:'稀缺级 · 关系里的硬通货',
+      line:'你不是「会恋爱」，你是少见的那一类：稳定、有边界、也愿意为关系负责。' },
+    { min:76, key:'A', text:'优质级 · 值得被认真对待',
+      line:'你的关系能力已经在线，少数短板不影响你被认真对待。' },
+    { min:62, key:'B', text:'成长期 · 底子好，还有空间',
+      line:'你的底子不差，问题集中在少数几个习惯上——改一件，观感就不同。' },
+    { min:0,  key:'C', text:'待建设 · 先把地基打稳',
+      line:'分数低不代表你不值得被爱，只说明这套能力你还没练过，它是可以练的。' }
+  ];
+
+  function compute(){
+    const sums = {}, counts = {};
+    DIMS.forEach(d=>{ sums[d.key]=0; counts[d.key]=0; });
+
+    Q.forEach((q,idx)=>{
+      const raw = state.answers[idx] || 3;
+      const v = q.rev ? (6 - raw) : raw;
+      sums[q.d] += v; counts[q.d] += 1;
+    });
+
+    const dims = DIMS.map(d=>({
+      ...d,
+      score: Math.round(sums[d.key] / (counts[d.key]*5) * 100)
+    }));
+
+    let total = 0;
+    dims.forEach(d=> total += d.score * d.weight);
+    total = Math.round(total);
+
+    const sorted = [...dims].sort((a,b)=> b.score - a.score);
+    const top = sorted[0];
+    const grade = GRADE.find(g=> total >= g.min);
+
+    return { total, dims, top, low:[...dims].sort((a,b)=>a.score-b.score), grade };
+  }
+
+  function bucket(s){
+    if(s >= 88) return '顶级';
+    if(s >= 75) return '在线';
+    if(s >= 60) return '及格';
+    return '待补';
+  }
+
+  /* ================= 结果渲染 ================= */
+  function finish(){
+    const r = compute();
+    quiz.style.display='none'; result.style.display='block';
+    window.scrollTo({top:0,behavior:'instant'});
+
+    // 分数动画
+    $('scoreNum').textContent = r.total;
+    const arc = $('ringArc'), C = 515.2;
+    arc.style.transition = 'none';
+    arc.style.strokeDashoffset = C;
+    void arc.offsetWidth;
+    arc.style.transition = 'stroke-dashoffset 1.3s cubic-bezier(.22,1,.36,1)';
+    arc.style.strokeDashoffset = C * (1 - r.total/100);
+    setTimeout(()=>{ arc.style.transition = 'none'; arc.style.strokeDashoffset = C * (1 - r.total/100); }, 1500);
+    animateNum($('scoreNum'), r.total, 1200);
+
+    const gb = $('gradeBadge');
+    gb.className = 'grade g-' + r.grade.key;
+    gb.textContent = r.grade.key + ' · ' + r.grade.text;
+
+    $('oneLine').textContent = r.grade.line;
+
+    // 类型
+    const flat = r.top.score < 60;
+    const t = flat ? TYPES.fallback : TYPES[r.top.key];
+    $('typeName').innerHTML = (flat ? '当前状态 · <span>' + t.name + '</span>'
+                                    : r.top.name + ' · <span>' + t.name + '</span>');
+    $('typeTag').textContent = t.tag;
+    $('typeDesc').textContent = t.desc;
+    $('typeHigh').innerHTML = t.high.map(h=>`<div class="li"><i></i><div>${h}</div></div>`).join('');
+    $('typeBlind').innerHTML = `<div class="li warn" style="margin-top:0"><i></i><div>${t.blind}</div></div>`;
+
+    drawRadar(r.dims);
+    renderBars(r.dims);
+
+    // 升级项
+    const lows = r.low.slice(0,2);
+    $('upgradeIntro').innerHTML = `你的整体表现是「<b style="color:var(--rose-deep)">${r.grade.text.split(' · ')[0]}</b>」，真正的提升空间在这两项：`;
+    $('upgradeList').innerHTML = lows.map(d=>
+      `<div class="li warn"><i></i><div><b style="color:var(--ink)">${d.name}（${d.score}）</b>：${d.action}</div></div>`
+    ).join('');
+    $('recipe').innerHTML = `<b style="color:var(--ink);font-weight:600">你的关系配方：</b>${t.match}`;
+
+    state.lastResult = {
+      score:r.total, grade:r.grade.key, type:t.name,
+      dims:r.dims.map(d=>({name:d.name,score:d.score})),
+      date: new Date().toLocaleDateString('zh-CN',{month:'2-digit',day:'2-digit'})
+    };
+    try{ localStorage.setItem('lovevalue_last', JSON.stringify(state.lastResult)); }catch(e){}
+
+    // 入场动画
+    document.querySelectorAll('.sec').forEach((el,idx)=>{
+      el.classList.remove('pop'); el.style.animationDelay = (idx*0.1+0.15)+'s'; void el.offsetWidth; el.classList.add('pop');
+    });
+  }
+
+  function animateNum(el, target, dur){
+    const t0 = Date.now();
+    const id = setInterval(()=>{
+      const p = Math.min(1,(Date.now()-t0)/dur);
+      if(p >= 1){ el.textContent = target; clearInterval(id); return; }
+      el.textContent = Math.round(target * (1 - Math.pow(1-p, 3)));
+    }, 16);
+  }
+
+  /* ================= 雷达图 ================= */
+  function drawRadar(dims){
+    const svg = $('radar');
+    const cx = 170, cy = 146, R = 90;
+    const n = dims.length;
+    const pt = (val, i, rad) => {
+      const a = -Math.PI/2 + i * 2*Math.PI/n;
+      const r = rad * val;
+      return [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+    };
+    let html = '';
+
+    // 网格
+    [0.25,0.5,0.75,1].forEach(lv=>{
+      const pts = dims.map((_,i)=> pt(lv,i,R).map(v=>v.toFixed(1)).join(',')).join(' ');
+      html += `<polygon points="${pts}" fill="none" stroke="#F1E3E1" stroke-width="1"/>`;
+    });
+    // 轴线
+    dims.forEach((_,i)=>{
+      const p = pt(1,i,R);
+      html += `<line x1="${cx}" y1="${cy}" x2="${p[0].toFixed(1)}" y2="${p[1].toFixed(1)}" stroke="#F1E3E1" stroke-width="1"/>`;
+    });
+
+    // 数据面
+    const dpts = dims.map((d,i)=> pt(d.score/100, i, R));
+    html += `<polygon points="${dpts.map(p=>p.map(v=>v.toFixed(1)).join(',')).join(' ')}"
+              fill="rgba(228,88,111,.18)" stroke="#E4586F" stroke-width="1.8" stroke-linejoin="round"/>`;
+    dpts.forEach(p=>{
+      html += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3" fill="#fff" stroke="#E4586F" stroke-width="1.8"/>`;
+    });
+
+    // 标签
+    dims.forEach((d,i)=>{
+      const p = pt(1.26, i, R);
+      const a = -Math.PI/2 + i * 2*Math.PI/n;
+      let anchor = 'middle';
+      if(Math.cos(a) > 0.28) anchor = 'start';
+      else if(Math.cos(a) < -0.28) anchor = 'end';
+      html += `<text x="${p[0].toFixed(1)}" y="${p[1].toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle">${d.name}</text>`;
+      html += `<text x="${p[0].toFixed(1)}" y="${(p[1]+13).toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle"
+                style="font-size:9.5px;fill:#C4B4C0">${d.score}</text>`;
+    });
+
+    svg.innerHTML = html;
+  }
+
+  /* ================= 维度条 ================= */
+  function renderBars(dims){
+    const box = $('bars');
+    box.innerHTML = '';
+    dims.forEach((d,i)=>{
+      const row = document.createElement('div');
+      row.className = 'bar-row';
+      const col = d.score >= 80 ? '#E4586F' : d.score >= 65 ? '#EE8B7E' : '#D9A64E';
+      row.innerHTML = `
+        <div class="bar-top"><b>${d.name}</b><span>${d.score} · ${bucket(d.score)}</span></div>
+        <div class="track"><div class="fill" style="background:${col}"></div></div>
+        <div class="bar-note">${d.note}</div>`;
+      box.appendChild(row);
+      setTimeout(()=>{ row.querySelector('.fill').style.width = d.score + '%'; }, 120 + i*80);
+    });
+  }
+
+  /* ================= 结果文案 / 分享 ================= */
+  function shareText(){
+    const r = state.lastResult;
+    if(!r) return '';
+    const top3 = [...r.dims].sort((a,b)=>b.score-a.score).slice(0,3)
+      .map(d=>`${d.name} ${d.score}`).join(' / ');
+    return `我的恋爱价值指数：${r.score} 分（${r.grade}级）\n关系人设：${r.type}\n${top3}\n\n你在关系里的稀缺度有多高？来测一下。`;
+  }
+
+  $('copyBtn').onclick = async ()=>{
+    const txt = shareText();
+    try{
+      await navigator.clipboard.writeText(txt);
+      toast('已复制，去粘贴给 TA 吧');
+    }catch(e){
+      const ta = document.createElement('textarea');
+      ta.value = txt; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove();
+      toast('已复制');
+    }
+  };
+
+  $('againBtn').onclick = ()=>{
+    result.style.display='none'; cover.style.display='block';
+    window.scrollTo({top:0,behavior:'instant'});
+    $('startBtn').click();
+  };
+
+  $('posterBtn').onclick = ()=>{
+    try{ makePoster(); }catch(e){ console.error(e); toast('生成失败，请截图保存'); }
+  };
+
+  function makePoster(){
+    const r = state.lastResult;
+    if(!r) return;
+    const W = 750, H = 1080, S = 2;
+    const cv = document.createElement('canvas');
+    cv.width = W*S; cv.height = H*S;
+    const g = cv.getContext('2d');
+    g.scale(S,S);
+
+    // 背景
+    const bg = g.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0,'#FFF8F5'); bg.addColorStop(0.55,'#FFF3F1'); bg.addColorStop(1,'#FDEBEC');
+    g.fillStyle = bg; g.fillRect(0,0,W,H);
+
+    // 装饰光斑
+    const blob = (x,y,rad,color)=>{
+      const rg = g.createRadialGradient(x,y,0,x,y,rad);
+      rg.addColorStop(0,color); rg.addColorStop(1,'rgba(255,255,255,0)');
+      g.fillStyle = rg; g.beginPath(); g.arc(x,y,rad,0,Math.PI*2); g.fill();
+    };
+    blob(640,110,230,'rgba(255,205,214,.55)');
+    blob(90,940,250,'rgba(255,225,200,.5)');
+
+    g.textAlign = 'center';
+
+    // 顶部标识
+    g.fillStyle = '#B08B93';
+    g.font = '500 20px "PingFang SC", sans-serif';
+    g.fillText('恋 爱 价 值 评 分', W/2, 96);
+    g.fillStyle = '#2A2230';
+    g.font = '600 30px "Songti SC", serif';
+    g.fillText('你在关系里的稀缺度', W/2, 142);
+
+    // 主卡
+    const cardX = 55, cardY = 190, cardW = W-110, cardH = 400, rad = 34;
+    g.save();
+    g.shadowColor = 'rgba(190,100,120,.18)'; g.shadowBlur = 40; g.shadowOffsetY = 14;
+    g.fillStyle = '#fff';
+    roundRect(g, cardX, cardY, cardW, cardH, rad); g.fill();
+    g.restore();
+
+    // 分数环
+    const ccx = W/2, ccy = cardY + 168, cr = 110;
+    g.lineWidth = 14; g.lineCap = 'round';
+    g.strokeStyle = '#F7EAE8';
+    g.beginPath(); g.arc(ccx,ccy,cr,-Math.PI/2, Math.PI*1.5); g.stroke();
+    const grad = g.createLinearGradient(ccx-cr, ccy-cr, ccx+cr, ccy+cr);
+    grad.addColorStop(0,'#F08A9C'); grad.addColorStop(1,'#D8415C');
+    g.strokeStyle = grad;
+    g.beginPath(); g.arc(ccx,ccy,cr,-Math.PI/2, -Math.PI/2 + Math.PI*2*(r.score/100)); g.stroke();
+
+    g.fillStyle = '#2A2230';
+    g.font = '600 84px "PingFang SC", sans-serif';
+    g.fillText(String(r.score), ccx, ccy + 18);
+    g.fillStyle = '#9A8B98';
+    g.font = '400 20px "PingFang SC", sans-serif';
+    g.fillText('分', ccx + 74, ccy + 18);
+
+    // 等级
+    g.fillStyle = '#C93F58';
+    g.font = '600 24px "PingFang SC", sans-serif';
+    g.fillText(r.grade + ' 级 · ' + r.type, ccx, cardY + 330);
+
+    g.fillStyle = '#5B4E60';
+    g.font = '400 21px "PingFang SC", sans-serif';
+    g.fillText('七维能力 · 恋爱价值指数', ccx, cardY + 372);
+
+    // 维度条
+    let by = 640;
+    r.dims.forEach(d=>{
+      g.textAlign = 'left';
+      g.fillStyle = '#5B4E60';
+      g.font = '400 22px "PingFang SC", sans-serif';
+      g.fillText(d.name, 90, by);
+      g.textAlign = 'right';
+      g.fillStyle = '#9A8B98';
+      g.font = '400 20px "PingFang SC", sans-serif';
+      g.fillText(String(d.score), W-90, by);
+
+      g.fillStyle = '#F7ECEA';
+      roundRect(g, 90, by+14, W-180, 8, 4); g.fill();
+      const bw = (W-180) * d.score/100;
+      const cg = g.createLinearGradient(90,0,90+bw,0);
+      cg.addColorStop(0,'#F0A0AC'); cg.addColorStop(1,'#D8415C');
+      g.fillStyle = cg;
+      roundRect(g, 90, by+14, Math.max(bw,6), 8, 4); g.fill();
+
+      by += 54;
+    });
+
+    // 底部
+    g.textAlign = 'center';
+    g.fillStyle = '#B6A8B4';
+    g.font = '400 19px "PingFang SC", sans-serif';
+    g.fillText('情绪价值测试 · ' + new Date().toLocaleDateString('zh-CN'), W/2, H-72);
+    g.fillStyle = '#D8415C';
+    g.font = '500 21px "PingFang SC", sans-serif';
+    g.fillText('7 维 · 28 题 · 约 3 分钟', W/2, H-36);
+
+    const url = cv.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `恋爱价值评分_${r.score}分.png`;
+    document.body.appendChild(a); a.click(); a.remove();
+    toast('结果图已保存，可以直接发给 TA');
+  }
+
+  function roundRect(ctx,x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+})();
+</script>
+</body>
+</html>
